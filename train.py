@@ -1,11 +1,12 @@
 import torch
-from tqdm import tqdm
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
-from utils import save_checkpoint, load_checkpoint, print_examples
-from get_loader import get_loader
+from tqdm import tqdm
+
+from dataloader import get_loader
+from helper import save_checkpoint, load_checkpoint
 from model import CNNtoRNN
 
 
@@ -20,8 +21,8 @@ def train():
     )
 
     train_loader, dataset = get_loader(
-        root_folder="flickr8k/images",
-        annotation_file="flickr8k/captions.txt",
+        root_folder="dataset/images",
+        annotation_file="dataset/captions.txt",
         transform=transform,
         num_workers=2,
     )
