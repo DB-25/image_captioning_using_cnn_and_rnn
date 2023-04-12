@@ -21,7 +21,7 @@ def train():
     )
 
     train_loader, dataset = get_loader(
-        root_folder="./dataset/images",
+        root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
         transform=transform,
         num_workers=2,
@@ -63,8 +63,6 @@ def train():
     model.train()
 
     for epoch in range(num_epochs):
-        # Uncomment the line below to see a couple of test cases
-        # print_examples(model, device, dataset)
 
         if save_model:
             checkpoint = {
