@@ -21,8 +21,8 @@ def train():
     )
 
     train_loader, dataset = get_loader(
-        root_folder="dataset/images",
-        annotation_file="dataset/captions.txt",
+        root_folder="./dataset/images",
+        annotation_file="./dataset/captions.txt",
         transform=transform,
         num_workers=2,
     )
