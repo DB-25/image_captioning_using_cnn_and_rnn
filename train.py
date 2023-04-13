@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
 from dataloader import get_loader
-from helper import save_checkpoint, load_checkpoint
+from helper import save_checkpoint, load_checkpoint, save_model
 from model import CNNtoRNN
 
 
@@ -24,13 +24,13 @@ def train():
         root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
         transform=transform,
-        num_workers=2,
+        num_workers=8,
     )
 
     torch.backends.cudnn.benchmark = True
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     load_model = False
-    save_model = False
+    saveModel = True
     train_CNN = False
 
     # Hyperparameters
@@ -39,10 +39,10 @@ def train():
     vocab_size = len(dataset.vocab)
     num_layers = 1
     learning_rate = 3e-4
-    num_epochs = 100
+    num_epochs = 10
 
     # for tensorboard
-    writer = SummaryWriter("runs/flickr")
+    writer = SummaryWriter("./runs/flickr")
     step = 0
 
     # initialize model, loss etc
@@ -51,7 +51,7 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Only finetune the CNN
-    for name, param in model.encoderCNN.inception.named_parameters():
+    for name, param in model.encoder.inception_model.named_parameters():
         if "fc.weight" in name or "fc.bias" in name:
             param.requires_grad = True
         else:
@@ -63,14 +63,6 @@ def train():
     model.train()
 
     for epoch in range(num_epochs):
-
-        if save_model:
-            checkpoint = {
-                "state_dict": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "step": step,
-            }
-            save_checkpoint(checkpoint)
 
         for idx, (imgs, captions) in tqdm(
             enumerate(train_loader), total=len(train_loader), leave=False
@@ -89,6 +81,18 @@ def train():
             optimizer.zero_grad()
             loss.backward(loss)
             optimizer.step()
+
+            if idx % 100 == 0:
+                print(f"\nEpoch [{epoch}/{num_epochs}] Loss: {loss.item():.4f}")
+
+    if saveModel:
+        checkpoint = {
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+            "step": step,
+        }
+        save_checkpoint(checkpoint)
+        save_model(model)
 
 
 if __name__ == "__main__":

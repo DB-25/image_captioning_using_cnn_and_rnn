@@ -5,6 +5,7 @@
 import torch
 import torch.nn as nn
 import torchvision
+import numpy as np
 
 
 # Defining the CNN model, it will be used to extract the features from the images
@@ -13,7 +14,7 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
         self.output_size = embed_size
         self.train_CNN = train_CNN
-        self.inception_model = torchvision.models.inception_v3(pretrained=True, aux_logits=False)
+        self.inception_model = torchvision.models.inception_v3(weights=torchvision.models.Inception_V3_Weights.IMAGENET1K_V1)
         self.inception_model.fc = nn.Linear(self.inception_model.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.5)
@@ -27,7 +28,9 @@ class CNN(nn.Module):
             else:
                 param.requires_grad = self.train_CNN
 
-        return self.dropout(self.relu(features))
+        features = self.relu(features[0])
+        features = self.dropout(features)
+        return features
 
 
 class RNN(nn.Module):

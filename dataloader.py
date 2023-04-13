@@ -107,7 +107,7 @@ def get_loader(
                         collate_fn=MyCollate(pad_idx=pad_idx),
                         )
 
-    return loader
+    return loader, dataset
 
 
 if __name__ == "__main__":
@@ -118,8 +118,8 @@ if __name__ == "__main__":
             transforms.ToTensor()
         ]
     )
-    dataloader = get_loader(".\dataset\images",
-                            annotation_file=".\dataset\captions.txt",
+    dataloader = get_loader("./dataset/images/",
+                            annotation_file="./dataset/captions.txt",
                             transform=transform)
 
     for idx, (imgs, captions) in enumerate(dataloader):
