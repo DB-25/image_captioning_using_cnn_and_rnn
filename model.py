@@ -70,7 +70,7 @@ class CNNtoRNN(nn.Module):
             for _ in range(max_length):
                 hiddens, states = self.decoder.lstm(x, states)
                 output = self.decoder.linear(hiddens.unsqueeze(0))
-                predicted = output.argmax(1)
+                predicted = torch.argmax(output)
                 result_caption.append(predicted.item())
                 x = self.decoder.embed_size(predicted).unsqueeze(0)
 

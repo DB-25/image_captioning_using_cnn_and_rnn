@@ -52,6 +52,8 @@ def print_examples(model, device, dataset):
         "Example 5 OUTPUT: "
         + " ".join(model.caption_image(test_img5.to(device), dataset.vocab))
     )
+    test_img6 = transform( Image.open("./dataset/images/667626_18933d713e.jpg").convert("RGB")).unsqueeze(0)
+    print("Example 6 OUTPUT: " + " ".join(model.caption_image(test_img6.to(device), dataset.vocab)))
     model.train()
 
 def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
