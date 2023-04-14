@@ -14,15 +14,15 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
         self.output_size = embed_size
         self.train_CNN = train_CNN
-        self.inception_model = torchvision.models.inception_v3(weights=torchvision.models.Inception_V3_Weights.IMAGENET1K_V1)
-        self.inception_model.fc = nn.Linear(self.inception_model.fc.in_features, embed_size)
+        self.model = torchvision.models.efficientnet_b7(weights=torchvision.models.EfficientNet_B7_Weights.IMAGENET1K_V1)
+        self.model.fc = nn.Linear(self.model.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, images):
-        features = self.inception_model(images)
+        features = self.model(images)
 
-        for name, param in self.inception_model.named_parameters():
+        for name, param in self.model.named_parameters():
             if 'fc.weight' in name or 'fc.bias' in name:
                 param.requires_grad = True
             else:

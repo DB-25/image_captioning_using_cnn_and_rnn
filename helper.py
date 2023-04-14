@@ -56,7 +56,7 @@ def print_examples(model, device, dataset):
     print("Example 6 OUTPUT: " + " ".join(model.caption_image(test_img6.to(device), dataset.vocab)))
     model.train()
 
-def save_checkpoint(state, filename="my_checkpoint.pth.tar"):
+def save_checkpoint(state, filename="my_checkpoint_efficient_net.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
@@ -69,7 +69,7 @@ def load_checkpoint(checkpoint, model, optimizer):
     return step
 
 
-def save_model(model, filename="my_model.pth"):
+def save_model(model, filename="efficient_net.pth"):
     print("=> Saving model")
     torch.save(model, filename)
 

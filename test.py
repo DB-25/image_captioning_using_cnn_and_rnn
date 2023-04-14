@@ -22,7 +22,7 @@ transform = transforms.Compose(
 # method to load the model and test its performance
 def test():
     # load the model
-    model = torch.load("./my_model.pth")
+    model = torch.load("./inception.pth")
     model.to(device)
     loader, dataset = dataloader.get_loader(
         root_folder="./dataset/images/",

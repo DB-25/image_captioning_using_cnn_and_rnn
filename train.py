@@ -51,14 +51,14 @@ def train():
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     # Only finetune the CNN
-    for name, param in model.encoder.inception_model.named_parameters():
+    for name, param in model.encoder.model.named_parameters():
         if "fc.weight" in name or "fc.bias" in name:
             param.requires_grad = True
         else:
             param.requires_grad = train_CNN
 
     if load_model:
-        step = load_checkpoint(torch.load("my_checkpoint.pth.tar"), model, optimizer)
+        step = load_checkpoint(torch.load("my_checkpoint_efficient_net.pth.tar"), model, optimizer)
 
     model.train()
 
