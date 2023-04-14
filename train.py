@@ -24,7 +24,7 @@ def train():
         root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
         transform=transform,
-        num_workers=8,
+        num_workers=2,
     )
 
     torch.backends.cudnn.benchmark = True
@@ -39,7 +39,7 @@ def train():
     vocab_size = len(dataset.vocab)
     num_layers = 1
     learning_rate = 3e-4
-    num_epochs = 100
+    num_epochs = 50
 
     # for tensorboard
     writer = SummaryWriter("./runs/flickr")
@@ -50,13 +50,6 @@ def train():
     model.to(device)
     criterion = nn.CrossEntropyLoss(ignore_index=dataset.vocab.stoi["<PAD>"])
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
-    # Only finetune the CNN
-    for name, param in model.encoder.model.named_parameters():
-        if "fc.weight" in name or "fc.bias" in name:
-            param.requires_grad = True
-        else:
-            param.requires_grad = train_CNN
 
     if load_model:
         step = load_checkpoint(torch.load("my_checkpoint_efficient_net.pth.tar"), model, optimizer)
