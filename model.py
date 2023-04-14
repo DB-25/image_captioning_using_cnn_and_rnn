@@ -5,6 +5,7 @@
 import torch
 import torch.nn as nn
 import torchvision
+from torchsummary import summary
 import numpy as np
 
 
@@ -15,21 +16,15 @@ class CNN(nn.Module):
         self.output_size = embed_size
         self.train_CNN = train_CNN
         self.model = torchvision.models.efficientnet_b7(weights=torchvision.models.EfficientNet_B7_Weights.IMAGENET1K_V1)
-        self.model.fc = nn.Linear(self.model.fc.in_features, embed_size)
-        self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.5)
+        # freeze the layers
+        for param in self.model.parameters():
+            param.requires_grad = False
+        self.model.classifier = nn.Linear(in_features=2560, out_features=self.output_size, bias=True)
+        # self.relu = nn.ReLU()
+        # self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, images):
         features = self.model(images)
-
-        for name, param in self.model.named_parameters():
-            if 'fc.weight' in name or 'fc.bias' in name:
-                param.requires_grad = True
-            else:
-                param.requires_grad = self.train_CNN
-
-        features = self.relu(features[0])
-        features = self.dropout(features)
         return features
 
 
@@ -42,7 +37,13 @@ class RNN(nn.Module):
         self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, features, captions):
-        embeddings = self.dropout(self.embed_size(captions))
+
+        # embeddings = self.dropout(self.embed_size(captions))
+        # embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
+        # lstm_out, _ = self.lstm(embeddings)
+        # outputs = self.linear(lstm_out)
+        # return outputs
+        embeddings = self.embed_size(captions)
         embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
         lstm_out, _ = self.lstm(embeddings)
         outputs = self.linear(lstm_out)
