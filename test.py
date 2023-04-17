@@ -22,10 +22,11 @@ transform = transforms.Compose(
 # method to load the model and test its performance
 def test():
     # load the model
-    model1 = torch.load("./inception.pth")
-    model1.to(device)
-    model2 = torch.load("./efficient_net.pth")
-    model2.to(device)
+
+    model_inception = torch.load("./inception.pth")
+    model_inception.to(device)
+    model_efficient_net = torch.load("./efficient_net.pth")
+    model_efficient_net.to(device)
     loader, dataset = dataloader.get_loader(
         root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
@@ -34,9 +35,9 @@ def test():
         num_workers=2,
     )
     print("Model 1 - Inception")
-    helper.print_examples(model1, device, dataset)
+    helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
-    helper.print_examples(model2, device, dataset)
+    helper.print_examples(model_efficient_net, device, dataset)
 
 
 if __name__ == "__main__":

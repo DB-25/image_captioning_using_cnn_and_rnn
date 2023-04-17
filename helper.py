@@ -2,6 +2,7 @@ import torch
 import torchvision.transforms as transforms
 import PIL.Image as Image
 
+
 def print_examples(model, device, dataset):
     transform = transforms.Compose(
         [
@@ -52,11 +53,18 @@ def print_examples(model, device, dataset):
         "Example 5 OUTPUT: "
         + " ".join(model.caption_image(test_img5.to(device), dataset.vocab))
     )
-    test_img6 = transform( Image.open("./dataset/images/667626_18933d713e.jpg").convert("RGB")).unsqueeze(0)
+    test_img6 = transform(Image.open("./dataset/images/667626_18933d713e.jpg").convert("RGB")).unsqueeze(0)
+    print("Example 6 CORRECT: Girl wearing a bikini lying on her back in a shallow pool of clear blue water")
     print("Example 6 OUTPUT: " + " ".join(model.caption_image(test_img6.to(device), dataset.vocab)))
     model.train()
 
-def save_checkpoint(state, filename="my_checkpoint_efficient_net.pth.tar"):
+
+def save_checkpoint_efficient_net(state, filename="my_checkpoint_efficient_net.pth.tar"):
+    print("=> Saving checkpoint")
+    torch.save(state, filename)
+
+
+def save_checkpoint_inception(state, filename="my_checkpoint_inception.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
@@ -69,7 +77,11 @@ def load_checkpoint(checkpoint, model, optimizer):
     return step
 
 
-def save_model(model, filename="efficient_net.pth"):
+def save_model_efficient_net(model, filename="efficient_net.pth"):
     print("=> Saving model")
     torch.save(model, filename)
 
+
+def save_model_inception(model, filename="inception.pth"):
+    print("=> Saving model")
+    torch.save(model, filename)
