@@ -98,8 +98,9 @@ def get_loader(
 
 ):
     dataset = FlickrDataset(root_folder, annotation_file, transform=transform)
+    print(len(dataset))
     pad_idx = dataset.vocab.stoi["<PAD>"]
-    train_dataset,test_dataset=torch.data.utils.random_split(dataset,[6400,2600])
+    train_dataset,test_dataset=torch.utils.data.random_split(dataset,[40000,455])
     
     train_loader = DataLoader(dataset=train_dataset,
                         batch_size=batch_size,
@@ -108,7 +109,7 @@ def get_loader(
                         pin_memory=pin_memory,
                         collate_fn=MyCollate(pad_idx=pad_idx),
                         )
-    test_loader=DataLoader(dataset=train_dataset,
+    test_loader=DataLoader(dataset=test_dataset,
                         batch_size=batch_size,
                         num_workers=num_workers,
                         shuffle=shuffle,
@@ -130,7 +131,8 @@ if __name__ == "__main__":
     dataloader = get_loader("./dataset/images/",
                             annotation_file="./dataset/captions.txt",
                             transform=transform)
+    
 
-    for idx, (imgs, captions) in enumerate(dataloader):
+    for idx,id, (imgs, captions) in enumerate(dataloader):
         print(imgs.shape)
         print(captions.shape)

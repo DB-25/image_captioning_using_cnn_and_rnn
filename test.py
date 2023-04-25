@@ -27,7 +27,7 @@ def test():
     model_inception.to(device)
     model_efficient_net = torch.load("./efficient_net.pth")
     model_efficient_net.to(device)
-    loader, dataset = dataloader.get_loader(
+    train_loader, test_loader, dataset = dataloader.get_loader(
         root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
         transform=transform,
@@ -38,6 +38,9 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
+
+    
+
 
 
 if __name__ == "__main__":
