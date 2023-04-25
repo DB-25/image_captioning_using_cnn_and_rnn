@@ -98,26 +98,28 @@ def get_loader(
 
 ):
     dataset = FlickrDataset(root_folder, annotation_file, transform=transform)
-    print(len(dataset))
     pad_idx = dataset.vocab.stoi["<PAD>"]
-    train_dataset,test_dataset=torch.utils.data.random_split(dataset,[40000,455])
-    
-    train_loader = DataLoader(dataset=train_dataset,
-                        batch_size=batch_size,
-                        num_workers=num_workers,
-                        shuffle=shuffle,
-                        pin_memory=pin_memory,
-                        collate_fn=MyCollate(pad_idx=pad_idx),
-                        )
-    test_loader=DataLoader(dataset=test_dataset,
-                        batch_size=batch_size,
-                        num_workers=num_workers,
-                        shuffle=shuffle,
-                        pin_memory=pin_memory,
-                        collate_fn=MyCollate(pad_idx=pad_idx),
-                        )
+    len_dataset = len(dataset)
+    len_train = int(0.8 * len_dataset)
+    len_test = len_dataset - len_train
+    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [len_train, len_test])
 
-    return train_loader,test_loader,dataset
+    train_loader = DataLoader(dataset=train_dataset,
+                              batch_size=batch_size,
+                              num_workers=num_workers,
+                              shuffle=shuffle,
+                              pin_memory=pin_memory,
+                              collate_fn=MyCollate(pad_idx=pad_idx),
+                              )
+    test_loader = DataLoader(dataset=test_dataset,
+                             batch_size=batch_size,
+                             num_workers=num_workers,
+                             shuffle=shuffle,
+                             pin_memory=pin_memory,
+                             collate_fn=MyCollate(pad_idx=pad_idx),
+                             )
+
+    return train_loader, test_loader, dataset
 
 
 if __name__ == "__main__":
@@ -128,11 +130,12 @@ if __name__ == "__main__":
             transforms.ToTensor()
         ]
     )
-    dataloader = get_loader("./dataset/images/",
+    train_loader, test_loader, dataset = get_loader("./dataset/images/",
                             annotation_file="./dataset/captions.txt",
                             transform=transform)
-    
 
-    for idx,id, (imgs, captions) in enumerate(dataloader):
-        print(imgs.shape)
-        print(captions.shape)
+    print("Train_loader: ", len(train_loader))
+    print("Test_loader: ", len(test_loader))
+
+
+
