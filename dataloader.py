@@ -98,7 +98,6 @@ def get_loader(
 
 ):
     dataset = FlickrDataset(root_folder, annotation_file, transform=transform)
-    print(len(dataset))
     pad_idx = dataset.vocab.stoi["<PAD>"]
     train_dataset,test_dataset=torch.utils.data.random_split(dataset,[40000,455])
     
@@ -128,11 +127,11 @@ if __name__ == "__main__":
             transforms.ToTensor()
         ]
     )
-    dataloader = get_loader("./dataset/images/",
+    train_loader,test_loader,dataset = get_loader("./dataset/images/",
                             annotation_file="./dataset/captions.txt",
                             transform=transform)
     
 
-    for idx,id, (imgs, captions) in enumerate(dataloader):
+    for idx,id, (imgs, captions) in enumerate(train_loader):
         print(imgs.shape)
         print(captions.shape)
