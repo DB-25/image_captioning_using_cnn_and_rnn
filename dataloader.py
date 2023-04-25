@@ -99,7 +99,16 @@ def get_loader(
 ):
     dataset = FlickrDataset(root_folder, annotation_file, transform=transform)
     pad_idx = dataset.vocab.stoi["<PAD>"]
-    loader = DataLoader(dataset=dataset,
+    train_dataset,test_dataset=torch.data.utils.random_split(dataset,[6400,2600])
+    
+    train_loader = DataLoader(dataset=train_dataset,
+                        batch_size=batch_size,
+                        num_workers=num_workers,
+                        shuffle=shuffle,
+                        pin_memory=pin_memory,
+                        collate_fn=MyCollate(pad_idx=pad_idx),
+                        )
+    test_loader=DataLoader(dataset=train_dataset,
                         batch_size=batch_size,
                         num_workers=num_workers,
                         shuffle=shuffle,
@@ -107,7 +116,7 @@ def get_loader(
                         collate_fn=MyCollate(pad_idx=pad_idx),
                         )
 
-    return loader, dataset
+    return train_loader,test_loader,dataset
 
 
 if __name__ == "__main__":
