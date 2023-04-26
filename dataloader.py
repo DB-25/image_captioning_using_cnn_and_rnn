@@ -10,7 +10,8 @@ import torchvision.transforms as transforms
 
 spacy_eng = spacy.load("en_core_web_sm")
 
-
+# set random seed
+torch.manual_seed(123)
 class Vocabulary:
     def __init__(self, freq_threshold):
         self.itos = {0: "<PAD>", 1: "<SOS>", 2: "<EOS>", 3: "<UNK>"}
@@ -101,8 +102,13 @@ def get_loader(
     pad_idx = dataset.vocab.stoi["<PAD>"]
     len_dataset = len(dataset)
     len_train = int(0.8 * len_dataset)
-    len_test = len_dataset - len_train
-    train_dataset, test_dataset = torch.utils.data.random_split(dataset, [len_train, len_test])
+
+
+    # Created using indices from 0 to train_size.
+    train_dataset = torch.utils.data.Subset(dataset, range(len_train))
+
+    # Created using indices from train_size to train_size + test_size.
+    test_dataset = torch.utils.data.Subset(dataset, range(len_train, len_dataset))
 
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
@@ -136,6 +142,8 @@ if __name__ == "__main__":
 
     print("Train_loader: ", len(train_loader))
     print("Test_loader: ", len(test_loader))
+
+    print(dataset[0][1])
 
 
 
