@@ -11,6 +11,7 @@ import nltk
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Normalizing and transforming the images
 transform = transforms.Compose(
     [
         transforms.Resize((356, 356)),
@@ -46,10 +47,9 @@ def test():
     # accuracy(model_efficient_net, train_loader, device, dataset, train=True, inception=False)
     accuracy(model_efficient_net, test_loader, device, dataset, train=False, inception=False)
 
-
+# method to calculate the accuracy of the model
 def accuracy(m, loader, device, dataset, train=True, inception=False):
-    # for each image in loader get model output get orignal predicted
-
+    # set the model to evaluation mode
     m.eval()
     with torch.no_grad():
         counter = 0
@@ -70,11 +70,13 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
 
             counter_index = counter
             candidate = []
+            # to remove the prohibited words from the candidate
             prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".", "-"]
 
             reference = []
             count = 0
             flag = 0
+            # get the caption for each image
             for j in range(counter_index, counter_index + 5):
                 l = []
                 if flag == 0:
@@ -100,10 +102,11 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
                     elif word not in prohibited:
                         l.append(word)
 
+            # calculate the bleu score between the reference and the candidate
             score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate, (1, 0, 0, 0)))
             counter += 5
         print("score: ", sum(score) / len(score))
 
-
+# calls the test method which loads the model and tests its performance
 if __name__ == "__main__":
     test()
