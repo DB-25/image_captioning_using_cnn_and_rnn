@@ -54,6 +54,15 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
     with torch.no_grad():
         counter = 0
         score = []
+        len_dataset = len(dataset)
+        len_train = int(0.8 * len_dataset)
+        if train:
+            start_index = 0
+
+        else:
+            start_index = len_train
+
+        counter = start_index
 
         for idx, (imgs, captions) in tqdm(
                 enumerate(loader), total=len(loader), leave=False
@@ -61,27 +70,34 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
 
             counter_index = counter
             candidate = []
-            prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", "."]
+            prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".","-"]
 
-            c = m.caption_image(imgs.to(device), dataset.vocab)
-            for e in c:
-                if e not in prohibited:
-                    candidate.append(e)
+            # c = m.caption_image(imgs.to(device), dataset.vocab)
+            # for e in c:
+            #     if e not in prohibited:
+            #         candidate.append(e)
 
-            len_dataset = len(dataset)
-            len_train = int(0.8 * len_dataset)
-            if train:
-                start_index = 0
-                end_index = len_train
-            else:
-                start_index = len_train
-                end_index = len_dataset
 
-            counter = start_index
             reference = []
-            prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", "."]
+            count=0
+            flag=0
             for j in range(counter_index, counter_index + 5):
                 l = []
+                if flag==0:
+                    imgs=dataset[j][0].unsqueeze(0)
+                    c = m.caption_image(imgs.to(device), dataset.vocab)
+                    for e in c:
+                        if e not in prohibited:
+                            candidate.append(e)
+                    flag=1
+                    count=+1
+                elif(count==4):
+                    count=0
+                    flag=0
+                else:
+                    count+=1
+
+
                 for i in range(dataset[j][1].shape[0]):
 
                     word = dataset.vocab.itos[dataset[j][1][i].item()]
@@ -91,11 +107,11 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
                     elif word not in prohibited:
                         l.append(word)
 
-                    print(dataset.vocab.itos[dataset[j][1][i].item()])
-            print("reference: ", reference)
-            print("candidate: ", candidate)
-            score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate))
+            #print("reference: ", reference)
+            #print("candidate: ", candidate)
+            score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate, (1,0,0,0)))
             counter += 5
+            #print(score)
         print("score: ", sum(score) / len(score))
 
 
