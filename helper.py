@@ -1,9 +1,11 @@
+# Importing the necessary libraries
 import torch
 import torchvision.transforms as transforms
 import PIL.Image as Image
 
-
+# Method to print the examples
 def print_examples(model, device, dataset):
+    # Applying image transformations to get uniform images
     transform = transforms.Compose(
         [
             transforms.Resize((299, 299)),
@@ -13,6 +15,7 @@ def print_examples(model, device, dataset):
     )
 
     model.eval()
+    # Loading test images and predicting captions
     test_img1 = transform(Image.open("./test_examples/dog.jpg").convert("RGB")).unsqueeze(
         0
     )
@@ -56,19 +59,20 @@ def print_examples(model, device, dataset):
     test_img6 = transform(Image.open("./dataset/images/667626_18933d713e.jpg").convert("RGB")).unsqueeze(0)
     print("Example 6 CORRECT: Girl wearing a bikini lying on her back in a shallow pool of clear blue water")
     print("Example 6 OUTPUT: " + " ".join(model.caption_image(test_img6.to(device), dataset.vocab)))
+    # Setting the model back to training mode
     model.train()
 
-
+# Method to save the checkpoint of efficient net
 def save_checkpoint_efficient_net(state, filename="my_checkpoint_efficient_net.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
-
+# Method to save the checkpoint of inception
 def save_checkpoint_inception(state, filename="my_checkpoint_inception.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
-
+# Method to load the checkpoint of the model
 def load_checkpoint(checkpoint, model, optimizer):
     print("=> Loading checkpoint")
     model.load_state_dict(checkpoint["state_dict"])
@@ -76,12 +80,12 @@ def load_checkpoint(checkpoint, model, optimizer):
     step = checkpoint["step"]
     return step
 
-
+# Method to save the efficient_net model
 def save_model_efficient_net(model, filename="efficient_net.pth"):
     print("=> Saving model")
     torch.save(model, filename)
 
-
+# Method to save the inception model
 def save_model_inception(model, filename="inception.pth"):
     print("=> Saving model")
     torch.save(model, filename)

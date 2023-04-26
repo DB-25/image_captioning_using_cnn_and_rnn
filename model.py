@@ -1,4 +1,6 @@
 # Dhruv Kamalesh Kumar
+# Mrudula Acharya
+# Kirti Deepak Kshirsagar
 # 09-04-2023
 
 # Importing the libraries
@@ -25,8 +27,9 @@ class CNNEfficientNet(nn.Module):
         features = self.model(images)
         return features
 
-
+# Defining the RNN model, it will be used to generate the captions given an image feature vector and a caption input
 class RNNEfficientNet(nn.Module):
+    # Constructor 
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
         super(RNNEfficientNet, self).__init__()
         self.embed_size = nn.Embedding(vocab_size, embed_size)
@@ -34,6 +37,7 @@ class RNNEfficientNet(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.dropout = nn.Dropout(p=0.5)
 
+    # Forward propagation
     def forward(self, features, captions):
         embeddings = self.embed_size(captions)
         embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
@@ -41,18 +45,22 @@ class RNNEfficientNet(nn.Module):
         outputs = self.linear(lstm_out)
         return outputs
 
-
+# Combining the CNN and RNN models
 class CNNtoRNNEfficientNet(nn.Module):
+
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, train_CNN=False):
         super(CNNtoRNNEfficientNet, self).__init__()
+        # Initializing the encoder and decoder
         self.encoder = CNNEfficientNet(embed_size, train_CNN)
         self.decoder = RNNEfficientNet(embed_size, hidden_size, vocab_size, num_layers)
 
+    # Forward propagation
     def forward(self, images, captions):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
-
+    
+    # Generates the caption for the image using decoder
     def caption_image(self, image, vocab, max_length=50):
         result_caption = []
 
@@ -74,8 +82,10 @@ class CNNtoRNNEfficientNet(nn.Module):
 
 
 ###################################################### Inception Model ################################################
-
+# This block of code performs image classification using the Inception-v3 architecture
+# Defining the CNN model, it will be used to extract the features from the images
 class CNNInception(nn.Module):
+    # Initialize the model
     def __init__(self, embed_size, train_CNN=False):
         super(CNNInception, self).__init__()
         self.output_size = embed_size
@@ -86,6 +96,7 @@ class CNNInception(nn.Module):
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.5)
 
+    # Forward propagation for image classification
     def forward(self, images):
         features = self.inception_model(images)
 
@@ -98,8 +109,7 @@ class CNNInception(nn.Module):
         features = self.relu(features[0])
         features = self.dropout(features)
         return features
-
-
+# Defining the RNN model, it will be used to generate the captions
 class RNNInception(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
         super(RNNInception, self).__init__()
@@ -108,6 +118,7 @@ class RNNInception(nn.Module):
         self.linear = nn.Linear(hidden_size, vocab_size)
         self.dropout = nn.Dropout(p=0.5)
 
+    # Forward propagation
     def forward(self, features, captions):
         embeddings = self.dropout(self.embed_size(captions))
         embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
@@ -115,7 +126,7 @@ class RNNInception(nn.Module):
         outputs = self.linear(lstm_out)
         return outputs
 
-
+# Combining the CNN and RNN models
 class CNNtoRNNInception(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, train_CNN=False):
         super(CNNtoRNNInception, self).__init__()
@@ -126,7 +137,7 @@ class CNNtoRNNInception(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
-
+    # Generates the caption for the image using a pre-trained encoder-decoder model
     def caption_image(self, image, vocab, max_length=50):
         result_caption = []
 

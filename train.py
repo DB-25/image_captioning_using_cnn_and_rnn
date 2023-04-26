@@ -1,3 +1,4 @@
+# Importing the libraries
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,6 +11,7 @@ from helper import load_checkpoint, save_model_inception, save_model_efficient_n
     save_checkpoint_efficient_net
 from model import CNNtoRNNEfficientNet, CNNtoRNNInception
 
+# Normalizing and transforming the images
 transform = transforms.Compose(
     [
         transforms.Resize((356, 356)),
@@ -19,11 +21,13 @@ transform = transforms.Compose(
     ]
 )
 
+
 torch.backends.cudnn.benchmark = True
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 load_model = False
 saveModel = True
 
+# Loading the dataset
 train_loader, test_loader, dataset = get_loader(
     root_folder="./dataset/images/",
     annotation_file="./dataset/captions.txt",
@@ -31,7 +35,7 @@ train_loader, test_loader, dataset = get_loader(
     num_workers=1,
 )
 
-
+# train the efficient_net model
 def train_efficient_net():
     # Hyperparameters
     embed_size = 256
@@ -51,6 +55,7 @@ def train_efficient_net():
     criterion = nn.CrossEntropyLoss(ignore_index=dataset.vocab.stoi["<PAD>"])
     optimizer = optim.Adam(model_efficient_net.parameters(), lr=learning_rate)
 
+    # only for loading the model
     if load_model:
         step = load_checkpoint(torch.load("my_checkpoint_efficient_net.pth.tar"), model_efficient_net, optimizer)
 
@@ -78,7 +83,7 @@ def train_efficient_net():
 
             if idx % 100 == 0:
                 print(f"\nEpoch [{epoch}/{num_epochs}] Loss: {loss.item():.4f}")
-
+    # save the model
     if saveModel:
         checkpoint = {
             "state_dict": model_efficient_net.state_dict(),
@@ -88,7 +93,7 @@ def train_efficient_net():
         save_checkpoint_efficient_net(checkpoint)
         save_model_efficient_net(model_efficient_net)
 
-
+# train the inception model
 def train_inception():
     # Hyperparameters
     embed_size = 256
@@ -114,7 +119,7 @@ def train_inception():
             param.requires_grad = True
         else:
             param.requires_grad = False
-
+    # only for loading the model
     if load_model:
         step = load_checkpoint(torch.load("my_checkpoint.pth.tar"), model_inception, optimizer)
 
@@ -142,7 +147,7 @@ def train_inception():
 
             if idx % 100 == 0:
                 print(f"\nEpoch [{epoch}/{num_epochs}] Loss: {loss.item():.4f}")
-
+    # save the model
     if saveModel:
         checkpoint = {
             "state_dict": model_inception.state_dict(),
@@ -152,21 +157,26 @@ def train_inception():
         save_checkpoint_inception(checkpoint)
         save_model_inception(model_inception)
 
-
+# main function
 if __name__ == "__main__":
     print("What model do you want to train? \nInception - 1\nEfficient_net - 2\nBoth - 3")
+    # input for which model to training
     input_for_training = int(input())
+    # training the Inception model
     if input_for_training == 1:
         print("Training - Inception")
         train_inception()
+    # training the Efficient_net model
     elif input_for_training == 2:
         print("Training - Efficient_net")
         train_efficient_net()
+    # training both the models
     elif input_for_training == 3:
         print("Training - Inception and Efficient_net")
         print("Training - Inception")
         train_inception()
         print("Training - Efficient_net")
         train_efficient_net()
+    # wrong input from user
     else:
         print("Wrong input")
