@@ -1,3 +1,7 @@
+# Kirti Deepak Kshirsagar
+# Dhruv Kamalesh Kumar
+# Mrudula Vivek Acharya
+
 # Importing the libraries
 import torch
 import torch.nn as nn
