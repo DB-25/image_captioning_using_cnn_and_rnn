@@ -19,6 +19,7 @@ efficientnet_model.to(device)
 inception_model.eval()
 efficientnet_model.eval()
 
+# Normalizing and transforming the images
 transform = transforms.Compose(
     [
         transforms.Resize((356, 356)),
@@ -28,6 +29,7 @@ transform = transforms.Compose(
     ]
 )
 
+# Loading the dataset
 train_loader, test_loader, dataset = get_loader(
     root_folder="./dataset/images/",
     annotation_file="./dataset/captions.txt",
