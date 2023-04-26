@@ -1,3 +1,4 @@
+# Import necessary libraries
 import os
 import pandas as pd
 import torch
@@ -8,22 +9,27 @@ from torch.utils.data import DataLoader
 from PIL import Image
 import torchvision.transforms as transforms
 
+# Load spacy english language model
 spacy_eng = spacy.load("en_core_web_sm")
 
-
+# This class is used to create vocabulary for the captions
 class Vocabulary:
+    # This function is used to initialize the vocabulary
     def __init__(self, freq_threshold):
         self.itos = {0: "<PAD>", 1: "<SOS>", 2: "<EOS>", 3: "<UNK>"}
         self.stoi = {"<PAD>": 0, "<SOS>": 1, "<EOS>": 2, "<UNK>": 3}
         self.freq_threshold = freq_threshold
 
+    # This function is used to get length of vocabulary
     def __len__(self):
         return len(self.itos)
 
+    # This function is used to tokenize the captions
     @staticmethod
     def tokenizer_eng(text):
         return [tok.text.lower() for tok in spacy_eng.tokenizer(text)]
 
+    # This function is used to build vocabulary
     def build_vocabulary(self, sentence_list):
         frequencies = {}
         idx = 4
@@ -38,12 +44,13 @@ class Vocabulary:
                     self.itos[idx] = word
                     idx += 1
 
+    # This function is used to convert text to numericalize form
     def numericalize(self, text):
         tokenized_text = self.tokenizer_eng(text)
         return [self.stoi[token] if token in self.stoi else self.stoi["<UNK>"]
                 for token in tokenized_text]
 
-
+# This class loads and preprocesses the images and captions from the Flickr8k dataset
 class FlickrDataset(Dataset):
     def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
@@ -55,13 +62,13 @@ class FlickrDataset(Dataset):
         self.captions = self.df["caption"]
 
         # Initialize vocabulary and build vocab
-
         self.vocab = Vocabulary(freq_threshold)
         self.vocab.build_vocabulary(self.captions.tolist())
 
     def __len__(self):
         return len(self.df)
 
+    # This function is used to get the item from the dataset
     def __getitem__(self, index):
         caption = self.captions[index]
         img_id = self.imgs[index]
@@ -74,7 +81,7 @@ class FlickrDataset(Dataset):
         numericalized_caption.append(self.vocab.stoi["<EOS>"])
         return img, torch.tensor(numericalized_caption)
 
-
+# This class is used to collate the data and pad the captions
 class MyCollate:
     def __init__(self, pad_idx):
         self.pad_idx = pad_idx
@@ -86,7 +93,7 @@ class MyCollate:
         targets = pad_sequence(targets, batch_first=False, padding_value=self.pad_idx)
         return imgs, targets
 
-
+# This function is used to create test and train dataloader
 def get_loader(
         root_folder,
         annotation_file,
@@ -123,13 +130,13 @@ def get_loader(
 
 
 if __name__ == "__main__":
-
     transform = transforms.Compose(
         [
             transforms.Resize((224, 224)),
             transforms.ToTensor()
         ]
     )
+    # Get train and test dataloader
     train_loader, test_loader, dataset = get_loader("./dataset/images/",
                             annotation_file="./dataset/captions.txt",
                             transform=transform)

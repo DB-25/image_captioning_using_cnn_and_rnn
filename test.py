@@ -1,5 +1,7 @@
 # Dhruv Kamalesh Kumar
-# 09-04-2023
+# Kirti Deepak Kshirsagar
+# Mrudula Acharya
+
 
 # import the libraries
 import torch
@@ -10,6 +12,7 @@ from tqdm import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Normalizing and transforming the images
 transform = transforms.Compose(
     [
         transforms.Resize((356, 356)),
@@ -23,11 +26,11 @@ transform = transforms.Compose(
 # method to load the model and test its performance
 def test():
     # load the model
-
     model_inception = torch.load("./inception.pth")
     model_inception.to(device)
     model_efficient_net = torch.load("./efficient_net.pth")
     model_efficient_net.to(device)
+    # load the dataset
     train_loader, test_loader, dataset = dataloader.get_loader(
         root_folder="./dataset/images/",
         annotation_file="./dataset/captions.txt",
@@ -39,14 +42,14 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
+    # print the accuracy of the model
     accuracy(model_inception,train_loader,device,dataset)
     accuracy(model_inception, test_loader, device, dataset)
     accuracy(model_efficient_net,train_loader,device,dataset)
     accuracy(model_efficient_net,test_loader,device,dataset)
 
 def accuracy(m,loader,device,dataset):
-    #for each image in loader get model output get orignal predicted
-
+    #for each image in loader get model output and get orignal predicted
         for idx, (imgs, captions) in tqdm(
                 enumerate(loader), total=len(loader), leave=False
         ):
