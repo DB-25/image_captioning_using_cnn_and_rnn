@@ -1,3 +1,4 @@
+# Importing the necessary libraries
 import os
 import pandas as pd
 import torch
@@ -8,10 +9,13 @@ from torch.utils.data import DataLoader
 from PIL import Image
 import torchvision.transforms as transforms
 
+# Loading the spacy english model
 spacy_eng = spacy.load("en_core_web_sm")
 
 # set random seed
 torch.manual_seed(123)
+
+# This class is used to create and maintain the vocabulary for the captions
 class Vocabulary:
     def __init__(self, freq_threshold):
         self.itos = {0: "<PAD>", 1: "<SOS>", 2: "<EOS>", 3: "<UNK>"}
@@ -21,10 +25,12 @@ class Vocabulary:
     def __len__(self):
         return len(self.itos)
 
+    # Tokenize the sentence using spacy
     @staticmethod
     def tokenizer_eng(text):
         return [tok.text.lower() for tok in spacy_eng.tokenizer(text)]
 
+    # Building the vocabulary
     def build_vocabulary(self, sentence_list):
         frequencies = {}
         idx = 4
@@ -39,12 +45,13 @@ class Vocabulary:
                     self.itos[idx] = word
                     idx += 1
 
+    # Numericalize the text
     def numericalize(self, text):
         tokenized_text = self.tokenizer_eng(text)
         return [self.stoi[token] if token in self.stoi else self.stoi["<UNK>"]
                 for token in tokenized_text]
 
-
+# This class loads and preprocesses the images and captions from the Flickr8k dataset
 class FlickrDataset(Dataset):
     def __init__(self, root_dir, captions_file, transform=None, freq_threshold=5):
         self.root_dir = root_dir
@@ -63,6 +70,7 @@ class FlickrDataset(Dataset):
     def __len__(self):
         return len(self.df)
 
+    # Get the image and caption at the specified index
     def __getitem__(self, index):
         caption = self.captions[index]
         img_id = self.imgs[index]
@@ -76,6 +84,7 @@ class FlickrDataset(Dataset):
         return img, torch.tensor(numericalized_caption)
 
 
+# This class is used to pad the captions to the same length
 class MyCollate:
     def __init__(self, pad_idx):
         self.pad_idx = pad_idx
@@ -87,7 +96,7 @@ class MyCollate:
         targets = pad_sequence(targets, batch_first=False, padding_value=self.pad_idx)
         return imgs, targets
 
-
+# This function is used to create the train and test dataloaders
 def get_loader(
         root_folder,
         annotation_file,
@@ -110,6 +119,7 @@ def get_loader(
     # Created using indices from train_size to train_size + test_size.
     test_dataset = torch.utils.data.Subset(dataset, range(len_train, len_dataset))
 
+    # Create train and test data loaders.
     train_loader = DataLoader(dataset=train_dataset,
                               batch_size=batch_size,
                               num_workers=num_workers,
