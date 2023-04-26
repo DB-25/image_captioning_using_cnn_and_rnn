@@ -3,6 +3,7 @@ import torch
 import torchvision.transforms as transforms
 import PIL.Image as Image
 
+
 # Method to print the examples
 def print_examples(model, device, dataset):
     # Applying image transformations to get uniform images
@@ -62,15 +63,18 @@ def print_examples(model, device, dataset):
     # Setting the model back to training mode
     model.train()
 
+
 # Method to save the checkpoint of efficient net
 def save_checkpoint_efficient_net(state, filename="my_checkpoint_efficient_net.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
+
 # Method to save the checkpoint of inception
 def save_checkpoint_inception(state, filename="my_checkpoint_inception.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
+
 
 # Method to load the checkpoint of the model
 def load_checkpoint(checkpoint, model, optimizer):
@@ -80,10 +84,12 @@ def load_checkpoint(checkpoint, model, optimizer):
     step = checkpoint["step"]
     return step
 
+
 # Method to save the efficient_net model
 def save_model_efficient_net(model, filename="efficient_net.pth"):
     print("=> Saving model")
     torch.save(model, filename)
+
 
 # Method to save the inception model
 def save_model_inception(model, filename="inception.pth"):

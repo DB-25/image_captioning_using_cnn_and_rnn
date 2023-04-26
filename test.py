@@ -37,29 +37,33 @@ def test():
         num_workers=2,
     )
 
-    #print("Model 1 - Inception")
+    print("Model 1 - Inception")
     helper.print_examples(model_inception, device, dataset)
-    #print("Model 2 - Efficient Net")
+    print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
-    accuracy(model_inception,train_loader,device,dataset,train=True)
-    accuracy(model_inception, test_loader, device, dataset, train=False)
-    accuracy(model_efficient_net,train_loader,device,dataset,train=True)
-    accuracy(model_efficient_net,test_loader,device,dataset,train=False)
+    accuracy(model_inception, train_loader, device, dataset, train=True, inception=True)
+    accuracy(model_inception, test_loader, device, dataset, train=False, inception=True)
+    accuracy(model_efficient_net, train_loader, device, dataset, train=True, inception=False)
+    accuracy(model_efficient_net, test_loader, device, dataset, train=False, inception=False)
 
-def accuracy(m,loader,device,dataset,train=True):
-    #for each image in loader get model output get orignal predicted
 
-        counter=0
-        score=[]
+def accuracy(m, loader, device, dataset, train=True, inception=False):
+    # for each image in loader get model output get orignal predicted
+
+    m.eval()
+    with torch.no_grad():
+        counter = 0
+        score = []
 
         for idx, (imgs, captions) in tqdm(
                 enumerate(loader), total=len(loader), leave=False
         ):
 
             counter_index = counter
-            candidate=[]
+            candidate = []
             prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", "."]
-            c=m.caption_image(imgs.to(device),dataset.vocab)
+
+            c = m.caption_image(imgs.to(device), dataset.vocab)
             for e in c:
                 if e not in prohibited:
                     candidate.append(e)
@@ -67,16 +71,16 @@ def accuracy(m,loader,device,dataset,train=True):
             len_dataset = len(dataset)
             len_train = int(0.8 * len_dataset)
             if train:
-                start_index=0
-                end_index=len_train
+                start_index = 0
+                end_index = len_train
             else:
-                start_index=len_train
+                start_index = len_train
                 end_index = len_dataset
 
-            counter=start_index
+            counter = start_index
             reference = []
             prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", "."]
-            for j in range(counter_index, counter_index+5):
+            for j in range(counter_index, counter_index + 5):
                 l = []
                 for i in range(dataset[j][1].shape[0]):
 
@@ -91,10 +95,8 @@ def accuracy(m,loader,device,dataset,train=True):
             print("reference: ", reference)
             print("candidate: ", candidate)
             score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate))
-            counter+=5
-        print("score: ", sum(score)/len(score))
-
-
+            counter += 5
+        print("score: ", sum(score) / len(score))
 
 
 if __name__ == "__main__":

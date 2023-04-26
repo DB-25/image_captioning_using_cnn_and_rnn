@@ -21,7 +21,6 @@ transform = transforms.Compose(
     ]
 )
 
-
 torch.backends.cudnn.benchmark = True
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 load_model = False
@@ -34,6 +33,7 @@ train_loader, test_loader, dataset = get_loader(
     transform=transform,
     num_workers=1,
 )
+
 
 # train the efficient_net model
 def train_efficient_net():
@@ -93,6 +93,7 @@ def train_efficient_net():
         save_checkpoint_efficient_net(checkpoint)
         save_model_efficient_net(model_efficient_net)
 
+
 # train the inception model
 def train_inception():
     # Hyperparameters
@@ -113,12 +114,6 @@ def train_inception():
     criterion = nn.CrossEntropyLoss(ignore_index=dataset.vocab.stoi["<PAD>"])
     optimizer = optim.Adam(model_inception.parameters(), lr=learning_rate)
 
-    # Only finetune the CNN
-    for name, param in model_inception.encoder.inception_model.named_parameters():
-        if "fc.weight" in name or "fc.bias" in name:
-            param.requires_grad = True
-        else:
-            param.requires_grad = False
     # only for loading the model
     if load_model:
         step = load_checkpoint(torch.load("my_checkpoint.pth.tar"), model_inception, optimizer)
@@ -156,6 +151,7 @@ def train_inception():
         }
         save_checkpoint_inception(checkpoint)
         save_model_inception(model_inception)
+
 
 # main function
 if __name__ == "__main__":

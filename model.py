@@ -27,6 +27,7 @@ class CNNEfficientNet(nn.Module):
         features = self.model(images)
         return features
 
+
 # Defining the RNN model, it will be used to generate the captions given an image feature vector and a caption input
 class RNNEfficientNet(nn.Module):
     # Constructor 
@@ -45,6 +46,7 @@ class RNNEfficientNet(nn.Module):
         outputs = self.linear(lstm_out)
         return outputs
 
+
 # Combining the CNN and RNN models
 class CNNtoRNNEfficientNet(nn.Module):
 
@@ -59,7 +61,7 @@ class CNNtoRNNEfficientNet(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
-    
+
     # Generates the caption for the image using decoder
     def caption_image(self, image, vocab, max_length=50):
         result_caption = []
@@ -92,6 +94,8 @@ class CNNInception(nn.Module):
         self.train_CNN = train_CNN
         self.inception_model = torchvision.models.inception_v3(
             weights=torchvision.models.Inception_V3_Weights.IMAGENET1K_V1)
+        for param in self.inception_model.parameters():
+            param.requires_grad = False
         self.inception_model.fc = nn.Linear(self.inception_model.fc.in_features, embed_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(p=0.5)
@@ -99,16 +103,11 @@ class CNNInception(nn.Module):
     # Forward propagation for image classification
     def forward(self, images):
         features = self.inception_model(images)
-
-        for name, param in self.inception_model.named_parameters():
-            if 'fc.weight' in name or 'fc.bias' in name:
-                param.requires_grad = True
-            else:
-                param.requires_grad = self.train_CNN
-
         features = self.relu(features[0])
         features = self.dropout(features)
         return features
+
+
 # Defining the RNN model, it will be used to generate the captions
 class RNNInception(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
@@ -126,6 +125,7 @@ class RNNInception(nn.Module):
         outputs = self.linear(lstm_out)
         return outputs
 
+
 # Combining the CNN and RNN models
 class CNNtoRNNInception(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers, train_CNN=False):
@@ -137,6 +137,7 @@ class CNNtoRNNInception(nn.Module):
         features = self.encoder(images)
         outputs = self.decoder(features, captions)
         return outputs
+
     # Generates the caption for the image using a pre-trained encoder-decoder model
     def caption_image(self, image, vocab, max_length=50):
         result_caption = []
