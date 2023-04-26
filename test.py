@@ -6,6 +6,7 @@ import torch
 import helper
 import dataloader
 import torchvision.transforms as transforms
+from tqdm import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -38,6 +39,24 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
+    accuracy(model_efficient_net,test_loader,device,dataset)
+    accuracy(model_efficient_net,test_loader,device,dataset)
+    accuracy(model_inception,train_loader,device,dataset)
+    accuracy(model_inception,train_loader,device,dataset)
+
+
+
+def accuracy(m,loader,device,dataset):
+    #for each image in loader get model output get orignal predicted 
+    
+        for idx, (imgs, captions) in tqdm(
+                enumerate(loader), total=len(loader), leave=False
+        ):
+            print(m.caption_image(imgs.to(device),dataset.vocab))
+            print(captions)
+
+
+
 
     
 
