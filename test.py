@@ -64,10 +64,9 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
 
         counter = start_index
 
-        for idx, (imgs, captions) in tqdm(
-                enumerate(loader), total=len(loader), leave=False
-        ):
+        for k in range(start_index, len_dataset):
 
+            print(k)
             counter_index = counter
             candidate = []
             # to remove the prohibited words from the candidate
