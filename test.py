@@ -39,10 +39,12 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
-    accuracy(model_efficient_net,test_loader,device,dataset)
-    accuracy(model_efficient_net,test_loader,device,dataset)
     accuracy(model_inception,train_loader,device,dataset)
-    accuracy(model_inception,train_loader,device,dataset)
+    accuracy(model_inception, test_loader, device, dataset)
+    accuracy(model_efficient_net,train_loader,device,dataset)
+    accuracy(model_efficient_net,test_loader,device,dataset)
+
+
 
 
 
