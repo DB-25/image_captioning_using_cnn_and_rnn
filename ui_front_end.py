@@ -1,5 +1,6 @@
 # Dhruv Kamalesh Kumar
-# 17-04-2023
+# Kirti Deepak Kshirsagar
+# Mrudula Vivek Acharya
 
 # Importing the libraries
 import torch
