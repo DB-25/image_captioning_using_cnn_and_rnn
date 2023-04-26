@@ -42,76 +42,14 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
-    # accuracy(model_inception, train_loader, device, dataset, train=True, inception=True)
-    accuracy(model_inception, test_loader, device, dataset, train=False, inception=True)
-    # accuracy(model_efficient_net, train_loader, device, dataset, train=True, inception=False)
-    accuracy(model_efficient_net, test_loader, device, dataset, train=False, inception=False)
-
-# method to calculate the accuracy of the model
-# def accuracy(m, loader, device, dataset, train=True, inception=False):
-#     # set the model to evaluation mode
-#     m.eval()
-#     with torch.no_grad():
-#         counter = 0
-#         score = []
-#         len_dataset = len(dataset)
-#         len_train = int(0.8 * len_dataset)
-#         if train:
-#             start_index = 0
-#
-#         else:
-#             start_index = len_train
-#
-#         counter = start_index
-#
-#         for k in range(start_index, len_dataset):
-#
-#             print(k)
-#             counter_index = counter
-#             candidate = []
-#             # to remove the prohibited words from the candidate
-#             prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".", "-"]
-#
-#             reference = []
-#             count = 0
-#             flag = 0
-#             # get the caption for each image
-#             for j in range(counter_index, counter_index + 5):
-#                 l = []
-#                 if flag == 0:
-#                     imgs = dataset[j][0].unsqueeze(0)
-#                     c = m.caption_image(imgs.to(device), dataset.vocab)
-#                     for e in c:
-#                         if e not in prohibited:
-#                             candidate.append(e)
-#                     flag = 1
-#                     count = +1
-#                 elif (count == 4):
-#                     count = 0
-#                     flag = 0
-#                 else:
-#                     count += 1
-#
-#                 for word in dataset[j][1]:
-#                     word = dataset.vocab.itos[word.item()]
-#                     # word = dataset.vocab.itos[dataset[j][1][i].item()]
-#                     if word == "<EOS>":
-#                         reference.append(l)
-#                         l = []
-#                     elif word not in prohibited:
-#                         l.append(word)
-#
-#             # calculate the bleu score between the reference and the candidate
-#             score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate, (1, 0, 0, 0)))
-#             counter += 5
-#         print("score: ", sum(score) / len(score))
-
+    accuracy(model_inception, device, dataset, train=False)
+    accuracy(model_efficient_net, device, dataset, train=False)
 
 # method to calculate the accuracy of the model
 # load each image one by one and generate the caption
 # calculate the bleu score between the generated caption and the actual caption
 # at the end return the average bleu score
-def accuracy(m, loader, device, dataset, train=True, inception=False):
+def accuracy(m, device, dataset, train=True):
     prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".", "-"]
     m.eval()
     with torch.no_grad():
