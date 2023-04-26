@@ -28,7 +28,7 @@ transform = transforms.Compose(
     ]
 )
 
-train_loader, dataset = get_loader(
+train_loader, test_loader, dataset = get_loader(
     root_folder="./dataset/images/",
     annotation_file="./dataset/captions.txt",
     transform=transform,
