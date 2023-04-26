@@ -44,13 +44,9 @@ def test():
     accuracy(model_efficient_net,train_loader,device,dataset)
     accuracy(model_efficient_net,test_loader,device,dataset)
 
-
-
-
-
 def accuracy(m,loader,device,dataset):
-    #for each image in loader get model output get orignal predicted 
-    
+    #for each image in loader get model output get orignal predicted
+
         for idx, (imgs, captions) in tqdm(
                 enumerate(loader), total=len(loader), leave=False
         ):
