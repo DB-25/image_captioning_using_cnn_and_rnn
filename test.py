@@ -41,9 +41,9 @@ def test():
     helper.print_examples(model_inception, device, dataset)
     print("Model 2 - Efficient Net")
     helper.print_examples(model_efficient_net, device, dataset)
-    accuracy(model_inception, train_loader, device, dataset, train=True, inception=True)
+    # accuracy(model_inception, train_loader, device, dataset, train=True, inception=True)
     accuracy(model_inception, test_loader, device, dataset, train=False, inception=True)
-    accuracy(model_efficient_net, train_loader, device, dataset, train=True, inception=False)
+    # accuracy(model_efficient_net, train_loader, device, dataset, train=True, inception=False)
     accuracy(model_efficient_net, test_loader, device, dataset, train=False, inception=False)
 
 
@@ -70,33 +70,26 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
 
             counter_index = counter
             candidate = []
-            prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".","-"]
-
-            # c = m.caption_image(imgs.to(device), dataset.vocab)
-            # for e in c:
-            #     if e not in prohibited:
-            #         candidate.append(e)
-
+            prohibited = ["<SOS>", "<EOS>", "<PAD>", "<UNK>", ".", "-"]
 
             reference = []
-            count=0
-            flag=0
+            count = 0
+            flag = 0
             for j in range(counter_index, counter_index + 5):
                 l = []
-                if flag==0:
-                    imgs=dataset[j][0].unsqueeze(0)
+                if flag == 0:
+                    imgs = dataset[j][0].unsqueeze(0)
                     c = m.caption_image(imgs.to(device), dataset.vocab)
                     for e in c:
                         if e not in prohibited:
                             candidate.append(e)
-                    flag=1
-                    count=+1
-                elif(count==4):
-                    count=0
-                    flag=0
+                    flag = 1
+                    count = +1
+                elif (count == 4):
+                    count = 0
+                    flag = 0
                 else:
-                    count+=1
-
+                    count += 1
 
                 for i in range(dataset[j][1].shape[0]):
 
@@ -107,11 +100,8 @@ def accuracy(m, loader, device, dataset, train=True, inception=False):
                     elif word not in prohibited:
                         l.append(word)
 
-            #print("reference: ", reference)
-            #print("candidate: ", candidate)
-            score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate, (1,0,0,0)))
+            score.append(nltk.translate.bleu_score.sentence_bleu(reference, candidate, (1, 0, 0, 0)))
             counter += 5
-            #print(score)
         print("score: ", sum(score) / len(score))
 
 
